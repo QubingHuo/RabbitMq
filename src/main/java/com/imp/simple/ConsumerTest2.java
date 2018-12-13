@@ -19,6 +19,8 @@ public class ConsumerTest2 {
             Connection connection = ConnectionUtils.getConnection();
             //获取一个通道
             Channel channel = connection.createChannel();
+            //创建一个队列
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
             //定义一个消费者
             Consumer consumer = new DefaultConsumer(channel) {
