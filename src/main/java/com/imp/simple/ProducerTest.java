@@ -9,12 +9,12 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author imp
- * @ClassName SimpleTest
+ * @ClassName ProducerTest
  * @Description TODO
  * @createTime 2018/12/12 16:57
  */
 public class ProducerTest {
-    private static final String QUEUE_NAME="test_simple_queue";
+    private static final String QUEUE_NAME="test_work_queue";
     public static void main(String[] args) {
         try {
             //获取一个连接
@@ -23,15 +23,15 @@ public class ProducerTest {
             Channel channel = connection.createChannel();
             //创建一个队列
             channel.queueDeclare(QUEUE_NAME,false,false,false,null);
-            String msg = "hello world";
-            channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
-            System.out.println("send msg: " + msg);
-
+            for (int i=0;i<50;i++) {
+                String msg = "hello " + i;
+                channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
+                System.out.println("send msg["+ i + "]: " + msg);
+                Thread.sleep(i*20);
+            }
             channel.close();
             connection.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
