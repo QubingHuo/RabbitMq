@@ -18,7 +18,11 @@ public class ConsumerTest1 {
             //获取一个连接
             Connection connection = ConnectionUtils.getConnection();
             //获取一个通道
-            Channel channel = connection.createChannel();
+            final Channel channel = connection.createChannel();
+            //声明队列
+            channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+            //保证每次只分发一个
+            channel.basicQos(1);
 
             //定义一个消费者
             Consumer consumer = new DefaultConsumer(channel) {
@@ -31,11 +35,14 @@ public class ConsumerTest1 {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }finally {
+                        System.out.println("consumer[1] done");
+                        channel.basicAck(envelope.getDeliveryTag(), false);
                     }
                 }
             };
 
-            boolean autoAck = true;
+            boolean autoAck = false;
             channel.basicConsume(QUEUE_NAME, autoAck, consumer);
         } catch (Exception e) {
             e.printStackTrace();

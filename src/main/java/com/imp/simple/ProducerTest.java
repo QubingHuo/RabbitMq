@@ -23,9 +23,16 @@ public class ProducerTest {
             Channel channel = connection.createChannel();
             //创建一个队列
             channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+            /**
+             * 1.对于同一个消费者，消息队列每次只发送一条消息
+             * 2.消息队列只有在接收到该消费者处理完的反馈信息之后，才会向该消费者发送下一条消息
+             */
+            int perfetchCount = 1;
+            channel.basicQos(perfetchCount);
+
             for (int i=0;i<50;i++) {
                 String msg = "hello " + i;
-                channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
+                channel.basicPublish("", QUEUE_NAME,null, msg.getBytes());
                 System.out.println("send msg["+ i + "]: " + msg);
                 Thread.sleep(i*20);
             }

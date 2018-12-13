@@ -18,7 +18,11 @@ public class ConsumerTest2 {
             //获取一个连接
             Connection connection = ConnectionUtils.getConnection();
             //获取一个通道
-            Channel channel = connection.createChannel();
+            final Channel channel = connection.createChannel();
+            //声明队列
+            channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+            //保证每次只分发一个
+            channel.basicQos(1);
 
             //定义一个消费者
             Consumer consumer = new DefaultConsumer(channel) {
@@ -26,16 +30,19 @@ public class ConsumerTest2 {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     String msg = new String(body, "utf-8");
-                    System.out.println("consumer[1] receive msg: " +msg);
+                    System.out.println("consumer[2] receive msg: " +msg);
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }finally {
+                        System.out.println("consumer[2] done");
+                        channel.basicAck(envelope.getDeliveryTag(), false);
                     }
                 }
             };
 
-            boolean autoAck = true;
+            boolean autoAck = false;
             channel.basicConsume(QUEUE_NAME, autoAck, consumer);
         } catch (Exception e) {
             e.printStackTrace();
