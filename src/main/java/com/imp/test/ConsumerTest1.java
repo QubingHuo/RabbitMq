@@ -12,8 +12,8 @@ import java.io.IOException;
  * @createTime 2018/12/12 16:57
  */
 public class ConsumerTest1 {
-    private static final String QUEUE_NAME="test_queue_fanout_email";
-    private static final String EXCHANGE_NAME="test_exchange_fanout";
+    private static final String QUEUE_NAME="test_queue_direct_1";
+    private static final String EXCHANGE_NAME="test_exchange_direct";
     public static void main(String[] args) {
         try {
             //获取一个连接
@@ -22,8 +22,9 @@ public class ConsumerTest1 {
             final Channel channel = connection.createChannel();
             //声明队列
             channel.queueDeclare(QUEUE_NAME,false,false,false,null);
-            //绑定队列到交换机转发器
-            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
+            //绑定队列到交换机
+            String routingKey = "error";
+            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, routingKey);
 
             //保证每次只分发一个
             channel.basicQos(1);
