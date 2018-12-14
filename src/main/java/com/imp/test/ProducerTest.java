@@ -4,6 +4,9 @@ import com.imp.utils.ConnectionUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 /**
  * @author imp
  * @ClassName ProducerTest
@@ -11,33 +14,27 @@ import com.rabbitmq.client.Connection;
  * @createTime 2018/12/12 16:57
  */
 public class ProducerTest {
-    private static final String EXCHANGE_NAME="test_exchange_topic";
-    public static void main(String[] args) {
+    private static final String QUEUE_NAME="test_queue_tx";
+    public static void main(String[] args) throws IOException, TimeoutException {
+        //获取一个连接
+        Connection connection = ConnectionUtils.getConnection();
+        //获取一个通道
+        Channel channel = connection.createChannel();
+        channel.queueDeclare(QUEUE_NAME,false,false,false,null);
         try {
-            //获取一个连接
-            Connection connection = ConnectionUtils.getConnection();
-            //获取一个通道
-            Channel channel = connection.createChannel();
-            /**
-             * 声明交换机，执行分发
-             * topic模式
-             */
-            channel.exchangeDeclare(EXCHANGE_NAME, "topic");
-
-            String msg = "goods...";
-            /**
-             * 这里修改routingKey，决定交换机将消息发送给哪些消费者
-             * 本例中，'info'只会发给ConsumerTest2，而'error'情况下两个消费者都可以接收到消息
-             */
-            String routingKey = "goods.update.v1";
-            channel.basicPublish(EXCHANGE_NAME, routingKey,null, msg.getBytes());
+            channel.txSelect();
+            String msg = "hello tx";
+            //出错时会回滚
+//            int a = 1/0;
+            channel.basicPublish("", QUEUE_NAME, null, msg.getBytes());
             System.out.println("send: " + msg);
-
-            channel.close();
-            connection.close();
+            channel.txCommit();
         }catch (Exception e) {
-            e.printStackTrace();
+            channel.txRollback();
+            System.out.println("send message txRollback");
         }
+        channel.close();
+        connection.close();
     }
 
 }
