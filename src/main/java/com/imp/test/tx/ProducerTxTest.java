@@ -10,7 +10,7 @@ import com.rabbitmq.client.Connection;
  * @createTime 2018/12/12 16:57
  */
 public class ProducerTxTest {
-    private static final String QUEUE_NAME="test_queue_confirm_single";
+    private static final String QUEUE_NAME="test_queue_confirm_tx";
     public static void main(String[] args) throws Exception {
         //获取一个连接
         Connection connection = ConnectionUtils.getConnection();
