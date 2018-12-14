@@ -11,7 +11,7 @@ import com.rabbitmq.client.Connection;
  * @createTime 2018/12/12 16:57
  */
 public class ProducerTest {
-    private static final String EXCHANGE_NAME="test_exchange_direct";
+    private static final String EXCHANGE_NAME="test_exchange_topic";
     public static void main(String[] args) {
         try {
             //获取一个连接
@@ -20,16 +20,16 @@ public class ProducerTest {
             Channel channel = connection.createChannel();
             /**
              * 声明交换机，执行分发
-             * 路由模式：direct
+             * topic模式
              */
-            channel.exchangeDeclare(EXCHANGE_NAME, "direct");
+            channel.exchangeDeclare(EXCHANGE_NAME, "topic");
 
-            String msg = "hello world";
+            String msg = "goods...";
             /**
              * 这里修改routingKey，决定交换机将消息发送给哪些消费者
              * 本例中，'info'只会发给ConsumerTest2，而'error'情况下两个消费者都可以接收到消息
              */
-            String routingKey = "error";
+            String routingKey = "goods.update.v1";
             channel.basicPublish(EXCHANGE_NAME, routingKey,null, msg.getBytes());
             System.out.println("send: " + msg);
 
