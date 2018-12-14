@@ -1,4 +1,4 @@
-package com.imp.test;
+package com.imp.test.confirm.batch;
 
 import com.imp.utils.ConnectionUtils;
 import com.rabbitmq.client.*;
@@ -7,12 +7,11 @@ import java.io.IOException;
 
 /**
  * @author imp
- * @ClassName ConsumerTest1
  * @Description TODO
  * @createTime 2018/12/12 16:57
  */
-public class ConsumerTest1 {
-    private static final String QUEUE_NAME="test_queue_tx";
+public class ConsumerBatchTest {
+    private static final String QUEUE_NAME="test_queue_confirm_batch";
     public static void main(String[] args) {
         try {
             //获取一个连接
@@ -23,8 +22,6 @@ public class ConsumerTest1 {
             channel.queueDeclare(QUEUE_NAME,false,false,false,null);
             //保证每次只分发一个
             channel.basicQos(1);
-
-
 
             //定义一个消费者
             Consumer consumer = new DefaultConsumer(channel) {
